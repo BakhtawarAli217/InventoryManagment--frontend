@@ -1,0 +1,103 @@
+@import "tailwindcss";
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+nav{
+  width: 15rem;
+  height: 100dvh;
+  background-color: #ffffff;
+  border-right: 1px solid #C6C6CD;
+  position: relative;
+ 
+}
+:root{
+  --inter-font:"Inter", sans-serif;
+  --jetBrain-font:"JetBrains Mono", monospace;
+}
+.nav-top{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+}
+.nav-top h1{
+  font-size: 1.2rem;
+  font-family: var(--inter-font);
+  color: #000000;
+}
+.nav-routes{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.nav-routes ul{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1rem;
+  list-style: none;
+}
+.nav-routes ul li a{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #57657B;
+  font-family: var(--inter-font);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+.nav-routes ul li{
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.nav-routes ul li:hover{
+  background-color: #D5E3FD;
+}
+
+.Active-Location{
+  background-color: #D5E3FD;
+}
+.itempage{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+.itempage-content{
+  width: calc(100% - 15rem);
+  padding: 1rem;
+}
+.itempage-content table{
+  width: 100%;
+  border-collapse:collapse;
+}
+.itempage-content table thead {
+  width: 100%;
+  background-color: #ECEEF0;
+  border: 1px solid #C6C6CD;
+}
+.itempage-content table thead tr th{
+  padding: 1rem;
+  border: 1px solid #C6C6CD;
+  font-family: var(--jetBrain-font);
+  color: #45464D;
+}
+.Additem-Page{
+  display: flex;
+  justify-content: center;
+ 
+}
+.add-item-input{
+  padding: 1rem;
+}
