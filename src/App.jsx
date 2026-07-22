@@ -17,6 +17,7 @@ const App = () => {
   const {loading}=useContext(loadingContext)
   return (
     <Router>
+        {loading && <Loader/>}
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -30,7 +31,7 @@ const App = () => {
         theme="light"
         transition={Bounce}
       />
-      {loading && <Loader/>}
+    
       <Routes>
         <Route path="/" element={<ItemPage />} />
         <Route path="/category" element={<ViewCategories/>} />

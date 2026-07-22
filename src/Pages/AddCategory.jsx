@@ -15,7 +15,7 @@ const AddCategory = () => {
             const url = `${import.meta.env.VITE_CATEGORY_BASE_URL}/Upload`;
             const response = await axios.post(url, { name: categoryName });
             const data = response.data.data;
-            setLoading(false);
+            hideLoader()
             toast.success("Category added successfully", {
                 position: "bottom-right",
                 autoClose: 5000,
@@ -26,6 +26,7 @@ const AddCategory = () => {
                 progress: undefined,
                 theme: "light",
             });
+            setCategoryName("")
         } catch (error) {
             setLoading(false);
             toast.error(

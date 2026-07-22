@@ -192,7 +192,7 @@ const AddModels = () => {
               </svg>
             )}
 
-            {loading ? "Adding..." : "Submit"}
+            {loading ? "Adding..." : "Add Model"}
           </button>
         </form>
       </section>
