@@ -97,20 +97,8 @@ const AddModels = () => {
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 w-full bg-white !p-4 rounded-xl shadow !mt-4"
         >
-          <div>
-            <label className="font-semibold text-[#515F74]">
-              Model Name
-            </label>
 
-            <input
-              type="text"
-              placeholder="Enter Model Name"
-              value={modelName}
-              onChange={(e) => setModelName(e.target.value)}
-              className="w-full border border-gray-300 !p-2 outline-none"
-            />
-          </div>
-
+          
           <div
             className="relative"
             ref={brandRef}
@@ -151,6 +139,21 @@ const AddModels = () => {
                 )}
               </div>
             )}
+          </div>
+
+
+          <div>
+            <label className="font-semibold text-[#515F74]">
+              Model Name
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter Model Name"
+              value={modelName}
+              onChange={(e) => setModelName(e.target.value)}
+              className="w-full border border-gray-300 !p-2 outline-none"
+            />
           </div>
 
           <button

@@ -18,9 +18,12 @@ const ItemPage = () => {
   const [sortType, setSortType] = useState("");
   const { showLoader, hideLoader } = useContext(loadingContext);
   const [hasMore, setHasMore] = useState(false);
+  const [searchType, setSearchType] = useState("name");
+  const [search, setSearch] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
-
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
@@ -55,15 +58,15 @@ const ItemPage = () => {
 
   const handleDelete = async (id) => {
     try {
-       const confirmed = await Swal.fire({
-              title: "Are you sure?",
-              text: "You won't be able to recover this item!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#d33",
-              cancelButtonColor: "#3085d6",
-              confirmButtonText: "Yes, delete it!",
-            });
+      const confirmed = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to recover this item!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+      });
       if (!confirmed) return;
       const url = `${import.meta.env.VITE_ITEM_BASE_URL}/Delete-Item/${id}`;
       showLoader();
@@ -105,23 +108,41 @@ const ItemPage = () => {
     }
   };
 
-  const sortedData = [...data].sort((a, b) => {
-    if (sortType === "phtl") {
-      return b.price - a.price;
-    } else if (sortType === "plth") {
-      return a.price - b.price;
-    } else {
-      return data;
+  const filteredData = data.filter((item) => {
+    if (searchType === "name") {
+      return item.name.toLowerCase().includes(search.toLowerCase());
     }
+
+    if (searchType === "price") {
+      const price = Number(item.price);
+
+      const min = minPrice ? Number(minPrice) : 0;
+      const max = maxPrice ? Number(maxPrice) : Infinity;
+
+      return price >= min && price <= max;
+    }
+
+    return true;
   });
 
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortType === "phtl") {
+      return b.price - a.price;
+    }
+
+    if (sortType === "plth") {
+      return a.price - b.price;
+    }
+
+    return 0;
+  });
   useEffect(() => {
     fetchData();
   }, []);
 
-  useEffect(()=>{
-    fetchData()
-  },[page])
+  useEffect(() => {
+    fetchData();
+  }, [page]);
 
   return (
     <div className="itempage relative min-h-screen">
@@ -137,12 +158,55 @@ const ItemPage = () => {
         {/* Sort Section */}
         <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
           <div className="searchbar w-full flex justify-between items-center">
-            <input
-              type="text"
-              placeholder="Search Items"
-              className="w-[50%] rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7]"
-            />
-            <button onClick={(e)=>navigate("/Add-inventory")} className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold ">
+            <div className="w-[70%] flex gap-2">
+              <select
+                className="bg-[#F2F4F6] border border-[#C3C6D7] rounded !p-2"
+                value={searchType}
+                onChange={(e) => {
+                  setSearchType(e.target.value);
+                  setSearch("");
+                  setMinPrice("");
+                  setMaxPrice("");
+                }}
+              >
+                <option value="name">Search By Name</option>
+                <option value="price">Price Range</option>
+              </select>
+
+              {searchType === "name" && (
+                <input
+                  type="text"
+                  placeholder="Search Items"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7]"
+                />
+              )}
+
+              {searchType === "price" && (
+                <>
+                  <input
+                    type="number"
+                    placeholder="Min Price"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    className="w-[30%] rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7]"
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="Max Price"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    className="w-[30%] rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7]"
+                  />
+                </>
+              )}
+            </div>
+            <button
+              onClick={(e) => navigate("/Add-inventory")}
+              className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
+            >
               Add New Inventory
             </button>
           </div>
@@ -276,25 +340,29 @@ const ItemPage = () => {
                   </td>
                 </tr>
               ))}
-             
-                <tr>
-                  <td colSpan={8}>
-                    <div className="flex justify-between items-center w-full !p-2 !px-4 bg-[#F2F4F6]">
-                      <p> 
-                        Showing 1 - {data.length} of {total}
-                      </p>{" "}
-                      <div className="">
-                        {Array.from(
-                          { length: totalNumberOfPages },
-                          (_, index) => (
-                            <button onClick={(e)=>setPage(index+1)} className="!p-1 !px-2 border-none outline-none text-white cursor-pointer aspect-square bg-[#004AC6]">{index + 1}</button>
-                          ),
-                        )}
-                      </div>
+
+              <tr>
+                <td colSpan={8}>
+                  <div className="flex justify-between items-center w-full !p-2 !px-4 bg-[#F2F4F6]">
+                    <p>
+                      Showing 1 - {data.length} of {total}
+                    </p>{" "}
+                    <div className="">
+                      {Array.from(
+                        { length: totalNumberOfPages },
+                        (_, index) => (
+                          <button
+                            onClick={(e) => setPage(index + 1)}
+                            className="!p-1 !px-2 border-none outline-none text-white cursor-pointer aspect-square bg-[#004AC6]"
+                          >
+                            {index + 1}
+                          </button>
+                        ),
+                      )}
                     </div>
-                  </td>
-                </tr>
-             
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
