@@ -67,7 +67,7 @@ const ItemPage = () => {
         cancelButtonColor: "#3085d6",
         confirmButtonText: "Yes, delete it!",
       });
-      if (!confirmed) return;
+      if (!confirmed.isConfirmed) return;
       const url = `${import.meta.env.VITE_ITEM_BASE_URL}/Delete-Item/${id}`;
       showLoader();
       const response = await axios.delete(url);
