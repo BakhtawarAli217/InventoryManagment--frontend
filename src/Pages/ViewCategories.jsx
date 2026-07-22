@@ -45,16 +45,20 @@ const ViewCategories = () => {
   };
   const handleDelete = async (id) => {
     try {
-      const confirmed = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to recover this item!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-      });
-      if (!confirmed) return;
+    const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to recover this item!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!",
+            });
+    
+            if (!result.isConfirmed) {
+                  
+                return;
+            }
       showLoader();
       const url = `${import.meta.env.VITE_CATEGORY_BASE_URL}/Delete-Category/${id}`;
       const response = await axios.delete(url);

@@ -55,6 +55,7 @@ const ViewModels = () => {
         });
 
         if (!result.isConfirmed) {
+              console.log("Delete cancelled");
             return;
         }
             const url=`${import.meta.env.VITE_MODEL_BASE_URL}/Delete-Model/${id}`;
