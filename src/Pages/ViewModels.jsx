@@ -124,7 +124,7 @@ const ViewModels = () => {
             <thead>
                 <tr>
                     <th>Sr</th>
-                    <th>Id</th>
+              
                     <th>Model Name</th>
                     <th>Actions</th>
                 </tr>
@@ -133,7 +133,7 @@ const ViewModels = () => {
                 {data.map((model, index) => (
                     <tr key={model.id}>
                         <td  className="border border-gray-300 !p-2 text-center">{index + 1}</td>
-                        <td className="border border-gray-300 !p-2 text-center">{model.id}</td>
+                      
                         <td className="border border-gray-300 !p-2 text-center">{model.name}</td>
                         <td className="border border-gray-300 !p-2 text-center">
                             <button onClick={()=>handleDelete(model.id)} className="bg-red-500 text-white !px-2 !py-1 cursor-pointer w-full rounded hover:bg-red-600">

@@ -12,6 +12,7 @@ const ViewBrand = () => {
     const [hasMore , setHasMore]=useState(true)
     const [total , setTotal]=useState(0)
     const [limit , setLimit]=useState(10)
+
     const totalNumberOfPages=Math.ceil(total/limit)
     
 
@@ -114,7 +115,7 @@ const ViewBrand = () => {
             <thead>
                 <tr>
                     <th>Sr</th>
-                    <th>Id</th>
+                   
                     <th>Brand Name</th>
                     <th>Actions</th>
                 </tr>
@@ -123,7 +124,7 @@ const ViewBrand = () => {
                 {data.map((brand, index) => (
                     <tr key={brand.id}>
                         <td  className="border border-gray-300 !p-2 text-center">{index + 1}</td>
-                        <td className="border border-gray-300 !p-2 text-center">{brand.id}</td>
+                       
                         <td className="border border-gray-300 !p-2 text-center">{brand.name}</td>
                         <td className="border border-gray-300 !p-2 text-center">
                             <button onClick={()=>handleDelete(brand.id)} className="bg-red-500 text-white !px-2 !py-1 cursor-pointer w-full rounded hover:bg-red-600">
