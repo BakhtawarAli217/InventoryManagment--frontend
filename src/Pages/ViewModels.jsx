@@ -44,16 +44,19 @@ const ViewModels = () => {
     }
     const handleDelete=async (id)=>{
         try {
-             const confirmed = await Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to recover this item!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, delete it!",
-                  });
-            if (!confirmed) return;
+             const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to recover this item!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
             const url=`${import.meta.env.VITE_MODEL_BASE_URL}/Delete-Model/${id}`;
             const response = await axios.delete(url);
             toast.success(response.data.message , {

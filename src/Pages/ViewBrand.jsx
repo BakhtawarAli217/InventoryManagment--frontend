@@ -4,6 +4,8 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { loadingContext } from '../context/LoadingContextProvider'
 import { useNavigate } from 'react-router-dom'
+import Swal from "sweetalert2";
+
 
 const ViewBrand = () => {
     const [data , setData]=useState([])
@@ -44,8 +46,19 @@ const ViewBrand = () => {
     }
     const handleDelete=async (id)=>{
         try {
-            const confirmed = window.confirm("Are you sure you want to delete this brand?");
-            if (!confirmed) return;
+           const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to recover this item!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
             const url=`${import.meta.env.VITE_BRAND_BASE_URL}/Delete-Brand/${id}`;
             showLoader()
             const response = await axios.delete(url);
