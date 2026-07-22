@@ -67,13 +67,13 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
           fetchCategoryData();
         }, []);
 
-        const fetchBrandData = async () => {
+        const fetchBrandData = async (categoryId) => {
             try {
-              const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${selectedCategory}&page=${brandPage}&limit=10`;
+              const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${categoryId}&page=${brandPage}&limit=10`;
               console.log(url);
               const response = await axios.get(url);
               setBrandData((prev) => response?.data?.data);
-              setBrandPage((prev) => prev + 1);
+              
               setHasBrandMore(response?.data?.hasMore);
             } catch (e) {
               console.log(e.response);
@@ -95,13 +95,13 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
             }
           };
         
-          const fetchModelData = async () => {
+          const fetchModelData = async (brandId) => {
             try {
-              const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${selectedBrand}&page=${modelPage}&limit=10`;
+              const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${brandId}&page=${modelPage}&limit=10`;
               console.log(url);
               const response = await axios.get(url);
               setModelData((prev) => response?.data?.data);
-              setModelPage((prev) => prev + 1);
+              
               setHasModelMore(response?.data?.hasMore);
             } catch (e) {
               console.log(e.response);
@@ -123,17 +123,17 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
             }
           };
 
-          useEffect(() => {
-            if (selectedCategory) {
-              fetchBrandData();
-            }
-          }, [selectedCategory]);
+          // useEffect(() => {
+          //   if (selectedCategory) {
+          //     fetchBrandData();
+          //   }
+          // }, [selectedCategory]);
 
-            useEffect(() => {
-            if (selectedBrand) {
-                fetchModelData();
-            }
-            }, [selectedBrand]);
+            // useEffect(() => {
+            // if (selectedBrand) {
+            //     fetchModelData();
+            // }
+            // }, [selectedBrand]);
 
     const fechItemData = async () => {
         
@@ -330,9 +330,30 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
                         key={index}
                         className="  w-full  !p-2  cursor-pointer  hover:bg-gray-100  rounded-md  text-[#515F74]"
                         onClick={() => {
+                            setSelectedCategory(item.id);
+                          setCategoryName(item.name);
+                          setCategoryPage(1);
+                          setCategoryDropDownOpen(false);
+
+                          setSelectedBrand(null);
+                          setSelectedModel(null);
+
+                          setBrandName("");
+                          setModelName("");
+
+                          setBrandData([]);
+                          setModelData([]);
+
+                          setBrandPage(1);
+                          setModelPage(1);
+
                           setSelectedCategory(item.id);
                           setCategoryName(item.name);
+
                           setCategoryDropDownOpen(false);
+
+                          // Fetch brands immediately
+                          fetchBrandData(item.id);
                         }}
                       >
                         {item.name}
@@ -389,9 +410,20 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
                         key={index}
                         className="  w-full  !p-2  cursor-pointer  hover:bg-gray-100  rounded-md  text-[#515F74]"
                         onClick={() => {
-                          setSelectedBrand(item.id);
+                        setSelectedBrand(item.id);
                           setBrandName(item.name);
                           setBrandDropDownOpen(false);
+                          setSelectedBrand(item.id);
+                          setBrandName(item.name);
+
+                          setSelectedModel(null);
+                          setModelName("");
+                          setModelData([]);
+                          setModelPage(1);
+
+                          setBrandDropDownOpen(false);
+
+                          fetchModelData(item.id);
                         }}
                       >
                         {item.name}
