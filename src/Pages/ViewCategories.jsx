@@ -1,13 +1,16 @@
-import React, { useState ,useEffect } from 'react'
+import React, { useState ,useEffect, useContext } from 'react'
 import Navbar from '../Components/Navbar'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { loadingContext } from '../context/LoadingContextProvider'
 
 const ViewCategories = () => {
     const [data , setData]=useState([])
+    const {showLoader , hideLoader}=useContext(loadingContext)
 
     const fetchData=async ()=>{
         try {
+            showLoader()
             const url=`${import.meta.env.VITE_CATEGORY_BASE_URL}/Get-All-Categories`;
             const response = await axios.get(url);
             setData(response.data.data);
@@ -24,12 +27,15 @@ const ViewCategories = () => {
                 progress: undefined,
                 theme: "light",
             });
+        }finally{
+            hideLoader()
         }
     }
     const handleDelete=async (id)=>{
         try {
             const confirmed = window.confirm("Are you sure you want to delete this category?");
             if (!confirmed) return;
+            showLoader()
             const url=`${import.meta.env.VITE_CATEGORY_BASE_URL}/Delete-Category/${id}`;
             const response = await axios.delete(url);
             toast.success(response.data.message , {
@@ -55,6 +61,8 @@ const ViewCategories = () => {
                 progress: undefined,
                 theme: "light",
             });
+        }finally{
+            hideLoader()
         }
     }
     useEffect(() => {

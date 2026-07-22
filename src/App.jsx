@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ItemPage from "./Pages/ItemPage";
 import Additem from "./Pages/Additem";
@@ -9,9 +9,12 @@ import AddModels from "./Pages/AddModels";
 import ViewBrand from "./Pages/ViewBrand";
 import ViewModels from "./Pages/ViewModels";
 import AddBrand from "./Pages/AddBrand";
+import { loadingContext } from "./context/LoadingContextProvider";
+import Loader from "./Components/loader";
 
 
 const App = () => {
+  const {loading}=useContext(loadingContext)
   return (
     <Router>
       <ToastContainer
@@ -27,6 +30,7 @@ const App = () => {
         theme="light"
         transition={Bounce}
       />
+      {loading && <Loader/>}
       <Routes>
         <Route path="/" element={<ItemPage />} />
         <Route path="/category" element={<ViewCategories/>} />

@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Navbar from "../Components/Navbar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { loadingContext } from "../context/LoadingContextProvider";
 
 const Additem = () => {
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -26,7 +27,7 @@ const Additem = () => {
   const [itemName, setItemName] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemStock, setItemStock] = useState("");
-  const [loading, setLoading] = useState(false);
+  const {showLoader ,hideLoader , loading}=useContext(loadingContext)
 
   const dropDownRef = useRef();
   const categoryRef = useRef();
@@ -61,7 +62,7 @@ const Additem = () => {
 
   const fetchCategoryData = async () => {
     try {
-      console.log("categ");
+      showLoader()
       const url = `${import.meta.env.VITE_Category_BASE_URL}/Get-All-Categories?page=${categoryPage}&limit=10`;
       const response = await axios.get(url);
       console.log(response?.data?.data);
@@ -85,6 +86,8 @@ const Additem = () => {
           theme: "light",
         },
       );
+    }finally{
+      hideLoader()
     }
   };
 
@@ -94,6 +97,7 @@ const Additem = () => {
 
   const fetchBrandData = async () => {
     try {
+      showLoader()
       const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${selectedCategory}&page=${brandPage}&limit=10`;
       console.log(url);
       const response = await axios.get(url);
@@ -117,11 +121,14 @@ const Additem = () => {
           theme: "light",
         },
       );
+    }finally{
+      hideLoader()
     }
   };
 
   const fetchModelData = async () => {
     try {
+      showLoader()
       const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${selectedBrand}&page=${modelPage}&limit=10`;
       console.log(url);
       const response = await axios.get(url);
@@ -145,6 +152,8 @@ const Additem = () => {
           theme: "light",
         },
       );
+    }finally{
+      hideLoader()
     }
   };
   useEffect(() => {
@@ -191,7 +200,7 @@ const Additem = () => {
     }
 
     try {
-      setLoading(true);
+      showLoader();
       const response = await axios.post(
         `${import.meta.env.VITE_ITEM_BASE_URL}/Add-Item`,
         formData,
@@ -232,7 +241,7 @@ const Additem = () => {
         },
       );
     } finally {
-      setLoading(false);
+      hideLoader();
     }
   };
 

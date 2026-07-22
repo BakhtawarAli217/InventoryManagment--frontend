@@ -1,15 +1,16 @@
-import React , {useEffect} from "react";
+import React , {useContext, useEffect} from "react";
 import Navbar from "../Components/Navbar";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { loadingContext } from "../context/LoadingContextProvider";
 
 const AddCategory = () => {
-    const [loading, setLoading] = React.useState(false);
+    const {showLoader , hideLoader , loading}=useContext(loadingContext)
     const [categoryName, setCategoryName] = React.useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        showLoader();
         try {
             const url = `${import.meta.env.VITE_CATEGORY_BASE_URL}/Upload`;
             const response = await axios.post(url, { name: categoryName });
@@ -42,6 +43,8 @@ const AddCategory = () => {
                     theme: "light",
                 }
             );
+        }finally{
+          hideLoader()
         }
     };
 

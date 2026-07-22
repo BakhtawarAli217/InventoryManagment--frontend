@@ -1,13 +1,16 @@
-import React, { useState ,useEffect } from 'react'
+import React, { useState ,useEffect, useContext } from 'react'
 import Navbar from '../Components/Navbar'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { loadingContext } from '../context/LoadingContextProvider'
 
 const ViewBrand = () => {
     const [data , setData]=useState([])
+    const {showLoader , hideLoader}=useContext(loadingContext)
 
     const fetchData=async ()=>{
         try {
+            showLoader()
             const url=`${import.meta.env.VITE_BRAND_BASE_URL}/Get-All-Brands`;
             const response = await axios.get(url);
             setData(response.data.data);
@@ -24,6 +27,8 @@ const ViewBrand = () => {
                 progress: undefined,
                 theme: "light",
             });
+        }finally{
+            hideLoader()
         }
     }
     const handleDelete=async (id)=>{
@@ -31,6 +36,7 @@ const ViewBrand = () => {
             const confirmed = window.confirm("Are you sure you want to delete this brand?");
             if (!confirmed) return;
             const url=`${import.meta.env.VITE_BRAND_BASE_URL}/Delete-Brand/${id}`;
+            showLoader()
             const response = await axios.delete(url);
             toast.success(response.data.message , {
                 position: "bottom-right",
@@ -55,6 +61,8 @@ const ViewBrand = () => {
                 progress: undefined,
                 theme: "light",
             });
+        }finally{
+            hideLoader()
         }
     }
     useEffect(() => {

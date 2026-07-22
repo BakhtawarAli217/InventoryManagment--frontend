@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { loadingContext } from "../context/LoadingContextProvider";
 
 const AddBrand = () => {
-  const [loading, setLoading] = useState(false);
+  const {showLoader , hideLoader , loading}=useContext(loadingContext)
 
   const [brandName, setBrandName] = useState("");
 
@@ -35,6 +36,7 @@ const AddBrand = () => {
 
   const fetchCategoryData = async () => {
     try {
+        showLoader()
       const response = await axios.get(
         `${import.meta.env.VITE_CATEGORY_BASE_URL}/Get-All-Categories`
       );
@@ -44,6 +46,8 @@ const AddBrand = () => {
       toast.error(
         e?.response?.data?.message || "Failed to fetch categories"
       );
+    }finally{
+        hideLoader()
     }
   };
 
@@ -56,7 +60,7 @@ const AddBrand = () => {
     }
 
     try {
-      setLoading(true);
+      showLoader()
 
       await axios.post(
         `${import.meta.env.VITE_BRAND_BASE_URL}/Upload-Brand`,
@@ -77,7 +81,7 @@ const AddBrand = () => {
           "Failed to add brand"
       );
     } finally {
-      setLoading(false);
+      hideLoader();
     }
   };
 

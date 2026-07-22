@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
 import Edititem from "../Components/EditItem";
 import { toast } from "react-toastify";
+import { loadingContext } from "../context/LoadingContextProvider";
 
 const ItemPage = () => {
   const [data, setData] = useState([]);
@@ -13,9 +14,11 @@ const ItemPage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [sortType , setSortType]=useState("")
+  const {showLoader  , hideLoader}=useContext(loadingContext)
 
   const fetchData = async () => {
     try {
+      showLoader()
       const url = `${import.meta.env.VITE_ITEM_BASE_URL}/Get-All-Items?page=${page}&limit=${limit}`;
       const response = await axios.get(url);
       setData(response.data.data);
@@ -37,6 +40,8 @@ const ItemPage = () => {
           theme: "light",
         },
       );
+    }finally{
+      hideLoader()
     }
   };
   const handleDelete = async (id) => {
@@ -46,6 +51,7 @@ const ItemPage = () => {
       );
       if (!confirmed) return;
       const url = `${import.meta.env.VITE_ITEM_BASE_URL}/Delete-Item/${id}`;
+      showLoader()
       const response = await axios.delete(url);
       toast.success(response.data.message, {
         position: "bottom-right",
@@ -79,6 +85,8 @@ const ItemPage = () => {
           theme: "light",
         },
       );
+    }finally{
+      hideLoader()
     }
   };
 

@@ -1,13 +1,16 @@
-import React, { useState ,useEffect } from 'react'
+import React, { useState ,useEffect, useContext } from 'react'
 import Navbar from '../Components/Navbar'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { loadingContext } from '../context/LoadingContextProvider'
 
 const ViewModels = () => {
     const [data , setData]=useState([])
+    const {showLoader , hideLoader , loading}=useContext(loadingContext)
 
     const fetchData=async ()=>{
         try {
+            showLoader()
             const url=`${import.meta.env.VITE_MODEL_BASE_URL}/Get-All-Models`;
             const response = await axios.get(url);
             setData(response.data.data);
@@ -24,6 +27,8 @@ const ViewModels = () => {
                 progress: undefined,
                 theme: "light",
             });
+        }finally{
+            hideLoader()
         }
     }
     const handleDelete=async (id)=>{

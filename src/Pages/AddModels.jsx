@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { loadingContext } from "../context/LoadingContextProvider";
 
 const AddModels = () => {
-  const [loading, setLoading] = useState(false);
+  const {showLoader , hideLoader , loading}=useContext(loadingContext)
 
   const [modelName, setModelName] = useState("");
 
@@ -35,6 +36,7 @@ const AddModels = () => {
 
   const fetchBrandData = async () => {
     try {
+      showLoader()
       const response = await axios.get(
         `${import.meta.env.VITE_BRAND_BASE_URL}/Get-All-Brands`
       );
@@ -44,6 +46,8 @@ const AddModels = () => {
       toast.error(
         e?.response?.data?.message || "Failed to fetch brands"
       );
+    }finally{
+      hideLoader()
     }
   };
 
@@ -56,7 +60,7 @@ const AddModels = () => {
     }
 
     try {
-      setLoading(true);
+      showLoader()
 
       await axios.post(
         `${import.meta.env.VITE_MODEL_BASE_URL}/Create-Model`,
@@ -78,7 +82,7 @@ const AddModels = () => {
           "Failed to add model"
       );
     } finally {
-      setLoading(false);
+      hideLoader()
     }
   };
 
