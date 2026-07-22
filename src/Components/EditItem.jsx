@@ -233,23 +233,27 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
   return (
 <div
   className={`
-    fixed inset-0 min-h-screen bg-black/90 shadow-lg
-    transition-transform duration-500 ease-in-out
-    overflow-y-auto flex justify-center items-center z-50
-    !p-3 sm:!p-5
-    ${isUpdating ? "translate-y-0" : "translate-y-full"}
+    fixed inset-0 bg-black/50 backdrop-blur-sm z-50
+    flex items-center justify-center
+    transition-all duration-300
+    ${isUpdating 
+      ? "opacity-100 visible" 
+      : "opacity-0 invisible"
+    }
   `}
 >
   <div
-    className="
-      w-full
-      sm:w-[90%]
-      md:w-[80%]
-      max-h-[95vh]
-      bg-white
-      rounded-2xl
+    className={`
+      w-full sm:w-[90%] md:w-[600px]
+      max-h-[90vh]
+      bg-white rounded-2xl shadow-2xl
       overflow-y-auto
-    "
+      transform transition-all duration-300
+      ${isUpdating 
+        ? "scale-100 translate-y-0" 
+        : "scale-95 translate-y-5"
+      }
+    `}
   >
         <div
   className="
