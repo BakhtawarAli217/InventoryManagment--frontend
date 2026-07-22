@@ -276,7 +276,7 @@ const ItemPage = () => {
                   </td>
                 </tr>
               ))}
-              {hasMore && (
+             
                 <tr>
                   <td colSpan={8}>
                     <div className="flex justify-between items-center w-full !p-2 !px-4 bg-[#F2F4F6]">
@@ -294,7 +294,7 @@ const ItemPage = () => {
                     </div>
                   </td>
                 </tr>
-              )}
+             
             </tbody>
           </table>
         </div>
