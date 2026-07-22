@@ -13,6 +13,9 @@ nav{
   position: relative;
  
 }
+body{
+  background-color: #F5F5F5;
+}
 :root{
   --inter-font:"Inter", sans-serif;
   --jetBrain-font:"JetBrains Mono", monospace;
@@ -75,7 +78,7 @@ nav{
   align-items: flex-start;
 }
 .itempage-content{
-  width: calc(100% - 15rem);
+  width: 100%;
   padding: 1rem;
 }
 .itempage-content table{
