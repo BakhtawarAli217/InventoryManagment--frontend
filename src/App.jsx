@@ -10,7 +10,7 @@ import ViewBrand from "./Pages/ViewBrand";
 import ViewModels from "./Pages/ViewModels";
 import AddBrand from "./Pages/AddBrand";
 import { loadingContext } from "./context/LoadingContextProvider";
-import Loader from "./Components/loader";
+import Loader from "./Components/Loader";
 
 
 const App = () => {
