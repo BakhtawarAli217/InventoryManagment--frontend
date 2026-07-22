@@ -94,7 +94,7 @@ const Navbar = () => {
               Category
             </Link>
           </li>
-          <li
+          {/* <li
             className={
               location.pathname === "/Add-inventory" ? "Active-Location" : ""
             }
@@ -116,7 +116,7 @@ const Navbar = () => {
               </p>
               Add Inventory
             </Link>
-          </li>
+          </li> */}
           <li
             className={
               location.pathname === "/Add-Category" ? "Active-Location" : ""

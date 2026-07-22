@@ -27,7 +27,7 @@ const Additem = () => {
   const [itemName, setItemName] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemStock, setItemStock] = useState("");
-  const {showLoader ,hideLoader , loading}=useContext(loadingContext)
+  const { showLoader, hideLoader, loading } = useContext(loadingContext);
 
   const dropDownRef = useRef();
   const categoryRef = useRef();
@@ -62,12 +62,11 @@ const Additem = () => {
 
   const fetchCategoryData = async () => {
     try {
-      showLoader()
+      showLoader();
       const url = `${import.meta.env.VITE_Category_BASE_URL}/Get-All-Categories?page=${categoryPage}&limit=10`;
       const response = await axios.get(url);
       console.log(response?.data?.data);
       setCategoryData((prev) => response?.data?.data);
-      setCategoryPage((prev) => prev + 1);
       setHasCategoryMore(response?.data?.hasMore);
     } catch (e) {
       console.log(e.response);
@@ -86,8 +85,11 @@ const Additem = () => {
           theme: "light",
         },
       );
-    }finally{
-      hideLoader()
+    } finally {
+      hideLoader();
+      setBrandData("");
+      setBrandName("");
+      setBrandPage(1);
     }
   };
 
@@ -95,41 +97,26 @@ const Additem = () => {
     fetchCategoryData();
   }, []);
 
-  const fetchBrandData = async () => {
+  const fetchBrandData = async (categoryId) => {
     try {
-      showLoader()
-      const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${selectedCategory}&page=${brandPage}&limit=10`;
-      console.log(url);
+      showLoader();
+
+      const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${categoryId}&page=1&limit=10`;
+
       const response = await axios.get(url);
-      setBrandData((prev) => response?.data?.data);
-      setBrandPage((prev) => prev + 1);
-      setHasBrandMore(response?.data?.hasMore);
+
+      setBrandData(response.data.data || []);
+      setHasBrandMore(response.data.hasMore);
     } catch (e) {
-      console.log(e.response);
-      toast.error(
-        e?.response?.data?.error ||
-          e?.response?.data?.message ||
-          "An error occured during fetching brands",
-        {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        },
-      );
-    }finally{
-      hideLoader()
+      console.log(e);
+    } finally {
+      hideLoader();
     }
   };
-
-  const fetchModelData = async () => {
+  const fetchModelData = async (brandId) => {
     try {
-      showLoader()
-      const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${selectedBrand}&page=${modelPage}&limit=10`;
+      showLoader();
+      const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${brandId}&page=${modelPage}&limit=10`;
       console.log(url);
       const response = await axios.get(url);
       setModelData((prev) => response?.data?.data);
@@ -152,21 +139,12 @@ const Additem = () => {
           theme: "light",
         },
       );
-    }finally{
-      hideLoader()
+    } finally {
+      hideLoader();
     }
   };
-  useEffect(() => {
-    if (selectedCategory !== null) {
-      fetchBrandData();
-    }
-  }, [selectedCategory]);
 
-  useEffect(() => {
-    if (selectedBrand !== null) {
-      fetchModelData();
-    }
-  }, [selectedBrand]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -250,7 +228,7 @@ const Additem = () => {
       <Navbar />
       <section className="itempage-content flex flex-col items-start p-3">
         <h2 className="text-2xl font-bold">Add Inventory</h2>
-        
+
         <form
           onSubmit={handleSubmit}
           className="flex flex-col items-center w-full gap-4 bg-white !p-4 !mt-3 rounded-2xl shadow-lg border-[#C6C6CD] border"
@@ -300,7 +278,28 @@ const Additem = () => {
                         onClick={() => {
                           setSelectedCategory(item.id);
                           setCategoryName(item.name);
+                          setCategoryPage(1);
                           setCategoryDropDownOpen(false);
+
+                          setSelectedBrand(null);
+                          setSelectedModel(null);
+
+                          setBrandName("");
+                          setModelName("");
+
+                          setBrandData([]);
+                          setModelData([]);
+
+                          setBrandPage(1);
+                          setModelPage(1);
+
+                          setSelectedCategory(item.id);
+                          setCategoryName(item.name);
+
+                          setCategoryDropDownOpen(false);
+
+                          // Fetch brands immediately
+                          fetchBrandData(item.id);
                         }}
                       >
                         {item.name}
@@ -360,6 +359,17 @@ const Additem = () => {
                           setSelectedBrand(item.id);
                           setBrandName(item.name);
                           setBrandDropDownOpen(false);
+                          setSelectedBrand(item.id);
+                          setBrandName(item.name);
+
+                          setSelectedModel(null);
+                          setModelName("");
+                          setModelData([]);
+                          setModelPage(1);
+
+                          setBrandDropDownOpen(false);
+
+                          fetchModelData(item.id);
                         }}
                       >
                         {item.name}
