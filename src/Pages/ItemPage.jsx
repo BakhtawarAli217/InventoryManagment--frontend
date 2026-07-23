@@ -7,7 +7,7 @@ import { loadingContext } from "../context/LoadingContextProvider";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDebounce } from "../hooks/useDebounce";
-import UploadItem from "../Components/uploadItem";
+import UploadItem from "../Components/UploadItem";
 
 const ItemPage = () => {
   const [data, setData] = useState([]);
