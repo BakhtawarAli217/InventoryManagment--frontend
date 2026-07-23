@@ -248,13 +248,19 @@ const ItemPage = () => {
               </select>
 
               {searchType === "name" && (
-                <input
-                  type="text"
-                  placeholder="Search Items"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7]"
-                />
+                <div className="relative w-full">
+  <input
+    type="text"
+    placeholder="Search Items"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-full rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7] pr-8"
+  />
+
+  <p className="absolute right-3 top-1/2 -translate-y-4 text-xl cursor-pointer" onClick={()=>setSearch("")}>
+    x
+  </p>
+</div>
               )}
 
               {searchType === "price" && (
