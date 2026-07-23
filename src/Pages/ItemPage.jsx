@@ -8,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDebounce } from "../hooks/useDebounce";
 import UploadItem from "../Components/UploadItem";
+import { FaAngleLeft } from "react-icons/fa6";
+import { FaAngleRight } from "react-icons/fa";
 
 const ItemPage = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(500);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -31,8 +33,44 @@ const ItemPage = () => {
   const searchDebounce = useDebounce(search, 500);
   const minPriceDebounce = useDebounce(minPrice, 500);
   const maxPriceDebounce = useDebounce(maxPrice, 500);
+  const totalNumberOfPages = Math.ceil(total / limit);
+
+  const [currentPageGroup, setCurrentPageGroup] = useState(0);
 
   const navigate = useNavigate();
+  const pagesPerGroup = 3;
+
+  const getVisiblePages = () => {
+    const startPage =
+      Math.floor((page - 1) / pagesPerGroup) * pagesPerGroup + 1;
+
+    const pages = [];
+
+    for (
+      let i = startPage;
+      i <= Math.min(startPage + pagesPerGroup - 1, totalNumberOfPages);
+      i++
+    ) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  const handleNextPage = () => {
+    if (page < totalNumberOfPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+    }
+  };
+  useEffect(() => {
+    setCurrentPageGroup(0);
+  }, [totalNumberOfPages]);
 
   const fetchData = async () => {
     try {
@@ -62,8 +100,6 @@ const ItemPage = () => {
       hideLoader();
     }
   };
-
-  const totalNumberOfPages = Math.ceil(total / limit);
 
   const handleDelete = async (id) => {
     try {
@@ -143,8 +179,8 @@ const ItemPage = () => {
       return a.price - b.price;
     }
 
-    if(sortType==="byn"){
-      return a.name.localeCompare(b.name)
+    if (sortType === "byn") {
+      return a.name.localeCompare(b.name);
     }
 
     return 0;
@@ -221,6 +257,54 @@ const ItemPage = () => {
 
   const tableData = searchResponse.length > 0 ? searchResponse : sortedData;
 
+  const exportCSV = () => {
+    if (!tableData || tableData.length === 0) {
+      toast.error("No data available to export");
+      return;
+    }
+
+    const headers = [
+      "Sr",
+      "Item Name",
+      "Item Category",
+      "Brand",
+      "Model",
+      "Price",
+      "Stock Level",
+    ];
+
+    const rows = tableData.map((item, index) => [
+      index + 1,
+      item.name,
+      item.categoryName,
+      item.brandName,
+      item.modelName,
+      item.price,
+      item.stock,
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "inventory.csv";
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="itempage relative min-h-screen">
       <Navbar />
@@ -238,6 +322,7 @@ const ItemPage = () => {
       />
       <div className="itempage-content w-full !p-3 sm:!p-5">
         {/* Sort Section */}
+
         <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
           <div className="searchbar w-full flex justify-between items-center">
             <div className="w-[70%] flex gap-2">
@@ -328,12 +413,21 @@ const ItemPage = () => {
               )}
             </div>
 
-            <button
-              onClick={(e) => setIsUploading(true)}
-              className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
-            >
-              Add New Inventory
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={exportCSV}
+                className="!p-3 bg-green-600 text-white rounded cursor-pointer font-bold"
+              >
+                Export CSV
+              </button>
+
+              <button
+                onClick={() => setIsUploading(true)}
+                className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold"
+              >
+                Add New Inventory
+              </button>
+            </div>
           </div>
           <div className="w-full flex justify-between items-center !p-2">
             <h2 className="text-[#191C1E] text-2xl font-semibold">
@@ -471,20 +565,55 @@ const ItemPage = () => {
                 <td colSpan={8}>
                   <div className="flex justify-between items-center w-full !p-2 !px-4 bg-[#F2F4F6]">
                     <p>
-                      Showing 1 - {data.length} of {total}
+                      Showing {page} - {data.length} of {total}
                     </p>{" "}
                     <div className="gap-2 flex">
-                      {Array.from(
-                        { length: totalNumberOfPages },
-                        (_, index) => (
-                          <button
-                            onClick={(e) => setPage(index + 1)}
-                            className="!p-1 !px-2 border-none outline-none text-white cursor-pointer aspect-square bg-[#004AC6]"
-                          >
-                            {index + 1}
-                          </button>
-                        ),
-                      )}
+                      <button
+                        onClick={handlePrevPage}
+                        disabled={(page === 1 || searchResponse.length>0)}
+                        className={`!p-1 !px-2 border-none outline-none cursor-pointer bg-[#004AC6] text-white ${
+                          page === 1
+                            ? "opacity-50 cursor-not-allowed"
+                            : "bg-[#004AC6] text-white"
+                        }`}
+                      >
+                        <p className="text-xl ">
+                          <FaAngleLeft />
+                        </p>
+                      </button>
+
+                      {/* Page Numbers */}
+                      {getVisiblePages().map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          disabled={searchResponse.length>0}
+                          onClick={() => {
+                            setPage(pageNum);
+                            setCurrentPageGroup(
+                              Math.floor((pageNum - 1) / pagesPerGroup),
+                            );
+                          }}
+                          className={`!p-2  rounded cursor-pointer ${page === pageNum ? "bg-blue-700 text-white" : "bg-blue-50"}`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+
+                      {/* Next Arrow */}
+                      <button
+                        onClick={handleNextPage}
+                        disabled={(page === totalNumberOfPages || searchResponse.length>0)}
+                        className={`!p-1 !px-2 border-none outline-none cursor-pointer bg-[#004AC6] text-white ${
+                          currentPageGroup >=
+                          Math.floor((totalNumberOfPages - 1) / 3)
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        <p className="text-xl">
+                          <FaAngleRight />
+                        </p>
+                      </button>
                     </div>
                   </div>
                 </td>
