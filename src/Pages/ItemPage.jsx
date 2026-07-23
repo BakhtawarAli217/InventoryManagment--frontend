@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { loadingContext } from "../context/LoadingContextProvider";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useDebounce } from "../hooks/useDebounce";
 
 const ItemPage = () => {
   const [data, setData] = useState([]);
@@ -22,6 +23,12 @@ const ItemPage = () => {
   const [search, setSearch] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [searchResponse, setSearchResponse] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const searchDebounce = useDebounce(search, 500);
+  const minPriceDebounce = useDebounce(minPrice, 500);
+  const maxPriceDebounce = useDebounce(maxPrice, 500);
 
   const navigate = useNavigate();
 
@@ -125,7 +132,7 @@ const ItemPage = () => {
     return true;
   });
 
-  const sortedData = [...filteredData].sort((a, b) => {
+  const sortedData = [...data].sort((a, b) => {
     if (sortType === "phtl") {
       return b.price - a.price;
     }
@@ -143,6 +150,70 @@ const ItemPage = () => {
   useEffect(() => {
     fetchData();
   }, [page]);
+
+  const searchData = async () => {
+    try {
+      setSearchLoading(true);
+      let searchUrl = "";
+      if (searchType === "name") {
+        searchUrl = `${import.meta.env.VITE_SEARCH_BASE_URL}/search-items?name=${search}`;
+      } else if (searchType === "price") {
+        searchUrl = `${import.meta.env.VITE_SEARCH_BASE_URL}/search-items?minPrice=${minPrice}&maxPrice=${maxPrice}`;
+      }
+      const response = await axios.get(searchUrl);
+      setSearchResponse(response.data.data);
+    } catch (e) {
+      toast.error(
+        e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          "Error while search the item",
+        {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        },
+      );
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchType === "name") {
+      if (searchDebounce) {
+        searchData();
+      }
+    }
+  }, [searchType, searchDebounce]);
+
+  useEffect(() => {
+    if (searchType === "price") {
+      if (minPriceDebounce || maxPriceDebounce) {
+        searchData();
+      }
+    }
+  }, [searchType, minPriceDebounce, maxPriceDebounce]);
+
+  useEffect(() => {
+    if (searchType === "name" && searchDebounce.trim() === "") {
+      setSearchResponse([]);
+    }
+
+    if (
+      searchType === "price" &&
+      minPriceDebounce === "" &&
+      maxPriceDebounce === ""
+    ) {
+      setSearchResponse([]);
+    }
+  }, [searchDebounce, minPriceDebounce, maxPriceDebounce, searchType]);
+
+  const tableData = searchResponse.length > 0 ? searchResponse : sortedData;
 
   return (
     <div className="itempage relative min-h-screen">
@@ -202,7 +273,41 @@ const ItemPage = () => {
                   />
                 </>
               )}
+              {searchLoading && (
+                <div className="search-loader flex items-center justify-center w-8 h-8">
+                  <svg
+                    className="w-6 h-6 animate-spin"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <defs>
+                      <linearGradient id="spinnerGradient">
+                        <stop
+                          offset="0%"
+                          stopColor="hsl(228, 97%, 42%)"
+                          stopOpacity="1"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="hsl(228, 97%, 42%)"
+                          stopOpacity="0.2"
+                        />
+                      </linearGradient>
+                    </defs>
+
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="8"
+                      stroke="url(#spinnerGradient)"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+              )}
             </div>
+
             <button
               onClick={(e) => navigate("/Add-inventory")}
               className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
@@ -252,7 +357,7 @@ const ItemPage = () => {
             </thead>
 
             <tbody>
-              {sortedData.map((item, index) => (
+              {tableData.map((item, index) => (
                 <tr key={item.id}>
                   <td className="border border-gray-300 !p-2 text-center">
                     {index + 1}
