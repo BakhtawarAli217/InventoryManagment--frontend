@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { loadingContext } from '../context/LoadingContextProvider'
 import { useNavigate } from 'react-router-dom'
 import Swal from "sweetalert2";
+import UploadModel from '../Components/UploadModel'
 
 const ViewModels = () => {
     const [data , setData]=useState([])
@@ -13,6 +14,7 @@ const ViewModels = () => {
     const [limit , setLimit]=useState(10)
     const [total , setTotal]=useState(0)
     const [hasMore , setHasMore]=useState(false)
+    const [isUpdating , setIsUpdating]=useState(false)
 
 
     const totalNumberOfPages=Math.ceil(total/limit)
@@ -23,6 +25,7 @@ const ViewModels = () => {
             showLoader()
             const url=`${import.meta.env.VITE_MODEL_BASE_URL}/Get-All-Models?page=${page}&limit=${limit}`;
             const response = await axios.get(url);
+           
             setData(response.data.data);
             setHasMore(response.data.hasMore)
             setTotal(response.data.total)
@@ -55,7 +58,7 @@ const ViewModels = () => {
         });
 
         if (!result.isConfirmed) {
-              console.log("Delete cancelled");
+              
             return;
         }
             const url=`${import.meta.env.VITE_MODEL_BASE_URL}/Delete-Model/${id}`;
@@ -98,6 +101,7 @@ const ViewModels = () => {
   return (
     <div className='itempage'>
       <Navbar/>
+      <UploadModel isUpdating={isUpdating} setIsUpdating={setIsUpdating} fetchData={fetchData}/>
       <div className="itempage-content">
           <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
           <div className="searchbar w-full flex justify-between items-center !p-3">
@@ -105,24 +109,13 @@ const ViewModels = () => {
               Models Overview
             </h2>
             <button
-              onClick={(e) => navigate("/Add-Models")}
+              onClick={(e) => setIsUpdating(true)}
               className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
             >
               Add New Model
             </button>
           </div>
-          {/* <div className="w-full flex justify-between items-center !p-2">
-            
-            <select
-              name="sort"
-              className="bg-[#FFFFFF] text-md !p-2 outline-none border border-[#C3C6D7] cursor-pointer "
-              onChange={(e) => setSortType(e.target.value)}
-            >
-              <option value="">Sort By</option>
-              <option value="phtl">Price High to Low</option>
-              <option value="plth">Price Low To High</option>
-            </select>
-          </div> */}
+         
         </div>
         <table  className="w-full border border-gray-300 rounded-lg overflow-auto backdrop:blur-md bg-white/30">
             <thead>
@@ -130,6 +123,7 @@ const ViewModels = () => {
                     <th>Sr</th>
               
                     <th>Model Name</th>
+                    <th>Brand Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -139,8 +133,10 @@ const ViewModels = () => {
                         <td  className="border border-gray-300 !p-2 text-center">{index + 1}</td>
                       
                         <td className="border border-gray-300 !p-2 text-center">{model.name}</td>
+                        <td className="border border-gray-300 !p-2 text-center">{model.brand.name}</td>
+                        
                         <td className="border border-gray-300 !p-2 text-center">
-                            <button onClick={()=>handleDelete(model.id)} className="bg-red-500 text-white !px-2 !py-1 cursor-pointer w-full rounded hover:bg-red-600">
+                            <button onClick={()=>handleDelete(model.id)} className="bg-red-500 text-white !px-4 !py-2 cursor-pointer  rounded hover:bg-red-600">
                                 Delete
                             </button>
                         </td>

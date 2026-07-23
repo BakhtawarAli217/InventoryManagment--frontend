@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { loadingContext } from '../context/LoadingContextProvider'
 import { useNavigate } from 'react-router-dom'
 import Swal from "sweetalert2";
+import UploadBrand from '../Components/UploadBrand'
 
 
 const ViewBrand = () => {
@@ -14,6 +15,8 @@ const ViewBrand = () => {
     const [hasMore , setHasMore]=useState(true)
     const [total , setTotal]=useState(0)
     const [limit , setLimit]=useState(10)
+    const [isUploading , setIsUploading]=useState(false)
+    const [loading , setLoading]=useState(false)
 
     const totalNumberOfPages=Math.ceil(total/limit)
     
@@ -99,6 +102,7 @@ const ViewBrand = () => {
   return (
     <div className='itempage'>
       <Navbar/>
+      <UploadBrand isUploading={isUploading} setIsUploading={setIsUploading} fetchData={fetchData}/>
       <div className="itempage-content">
           <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
           <div className="searchbar w-full flex justify-between items-center !p-3">
@@ -106,7 +110,7 @@ const ViewBrand = () => {
               Brands Overview
             </h2>
             <button
-              onClick={(e) => navigate("/Add-Brands")}
+              onClick={(e) => setIsUploading(true)}
               className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
             >
               Add New Brand
@@ -141,7 +145,7 @@ const ViewBrand = () => {
                        
                         <td className="border border-gray-300 !p-2 text-center">{brand.name}</td>
                         <td className="border border-gray-300 !p-2 text-center">
-                            <button onClick={()=>handleDelete(brand.id)} className="bg-red-500 text-white !px-2 !py-1 cursor-pointer w-full rounded hover:bg-red-600">
+                            <button onClick={()=>handleDelete(brand.id)} className="bg-red-500 text-white !px-4 !py-2 cursor-pointer  rounded hover:bg-red-600">
                                 Delete
                             </button>
                         </td>

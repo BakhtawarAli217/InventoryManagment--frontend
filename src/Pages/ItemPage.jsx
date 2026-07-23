@@ -7,6 +7,7 @@ import { loadingContext } from "../context/LoadingContextProvider";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDebounce } from "../hooks/useDebounce";
+import UploadItem from "../Components/uploadItem";
 
 const ItemPage = () => {
   const [data, setData] = useState([]);
@@ -25,6 +26,7 @@ const ItemPage = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [searchResponse, setSearchResponse] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [isUploading , setIsUploading]=useState(false)
 
   const searchDebounce = useDebounce(search, 500);
   const minPriceDebounce = useDebounce(minPrice, 500);
@@ -223,8 +225,9 @@ const ItemPage = () => {
         isUpdating={isUpdating}
         setIsUpdating={setIsUpdating}
         id={selectedItemId}
+        fetchData={fetchData}
       />
-
+      <UploadItem isUploading={isUploading} setIsUploading={setIsUploading} fetchData={fetchData}/>
       <div className="itempage-content w-full !p-3 sm:!p-5">
         {/* Sort Section */}
         <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
@@ -309,7 +312,7 @@ const ItemPage = () => {
             </div>
 
             <button
-              onClick={(e) => navigate("/Add-inventory")}
+              onClick={(e) => setIsUploading(true)}
               className="!p-3 bg-[#004AC6] text-white rounded cursor-pointer font-bold "
             >
               Add New Inventory

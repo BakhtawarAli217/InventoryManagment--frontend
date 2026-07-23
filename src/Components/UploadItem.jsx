@@ -3,13 +3,12 @@ import Navbar from "../Components/Navbar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { loadingContext } from "../context/LoadingContextProvider";
 
-const Additem = () => {
+const UploadItem = ({ isUploading, setIsUploading ,fetchData }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [brandPage, setBrandPage] = useState(1);
   const [brandData, setBrandData] = useState([]);
-  const [hasBrandMore, setHasBrandMore] = useState(true);
+  const [hasBrandMore, setHasBrandMore] = useState(false);
   const [brandDropDownOpen, setBrandDropDownOpen] = useState(false);
   const [categoryDropDownOpen, setCategoryDropDownOpen] = useState(false);
   const [hasCategoryMore, setHasCategoryMore] = useState(true);
@@ -22,12 +21,15 @@ const Additem = () => {
   const [categoryData, setCategoryData] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [modelName, setModelName] = useState("");
-  const [hasModelMore, setHasModelMore] = useState(true);
+  const [hasModelMore, setHasModelMore] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [itemName, setItemName] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemStock, setItemStock] = useState("");
-  const { showLoader, hideLoader, loading } = useContext(loadingContext);
+  const [brandLoading , setBrandLoading]=useState(false)
+  const [modelLoading , setModelLoading]=useState(false)
+  const [categoryLoading , setCategoryLoading]=useState(false)
+  const [loading , setLoading]=useState(false)
 
   const dropDownRef = useRef();
   const categoryRef = useRef();
@@ -62,7 +64,7 @@ const Additem = () => {
 
   const fetchCategoryData = async () => {
     try {
-      showLoader();
+      setCategoryLoading(true)
       const url = `${import.meta.env.VITE_Category_BASE_URL}/Get-All-Categories?page=${categoryPage}&limit=10`;
       const response = await axios.get(url);
       console.log(response?.data?.data);
@@ -86,7 +88,7 @@ const Additem = () => {
         },
       );
     } finally {
-      hideLoader();
+      setCategoryLoading(false)
       setBrandData("");
       setBrandName("");
       setBrandPage(1);
@@ -99,8 +101,8 @@ const Additem = () => {
 
   const fetchBrandData = async (categoryId) => {
     try {
-      showLoader();
-
+      
+      setBrandLoading(true)
       const url = `${import.meta.env.VITE_BRAND_BASE_URL}/Get-brand-By-Category?id=${categoryId}&page=1&limit=10`;
 
       const response = await axios.get(url);
@@ -110,12 +112,12 @@ const Additem = () => {
     } catch (e) {
       console.log(e);
     } finally {
-      hideLoader();
+      setBrandLoading(false)
     }
   };
   const fetchModelData = async (brandId) => {
     try {
-      showLoader();
+      setModelLoading(true)
       const url = `${import.meta.env.VITE_MODEL_BASE_URL}/Get-model-By-Brand?id=${brandId}&page=${modelPage}&limit=10`;
       console.log(url);
       const response = await axios.get(url);
@@ -140,11 +142,9 @@ const Additem = () => {
         },
       );
     } finally {
-      hideLoader();
+      setModelLoading(false)
     }
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -178,7 +178,7 @@ const Additem = () => {
     }
 
     try {
-      showLoader();
+    setLoading(true)
       const response = await axios.post(
         `${import.meta.env.VITE_ITEM_BASE_URL}/Add-Item`,
         formData,
@@ -219,19 +219,54 @@ const Additem = () => {
         },
       );
     } finally {
-      hideLoader();
+      setLoading(false)
+      fetchData()
     }
   };
 
   return (
-    <div className="Additem-Page">
-      <Navbar />
-      <section className="itempage-content flex flex-col items-start p-3">
-        <h2 className="text-2xl font-bold">Add Inventory</h2>
+    <div
+      className={`
+    fixed inset-0 bg-black/50 backdrop-blur-sm z-50
+    flex items-center justify-center
+    transition-all duration-300
+    ${isUploading ? "opacity-100 visible" : "opacity-0 invisible"}
+  `}
+    >
+      <section
+        className={`
+      w-full sm:w-[90%] md:w-[600px]
+      max-h-[90vh]
+      bg-white rounded-2xl shadow-2xl
+      overflow-y-auto
+      transform transition-all duration-300
+      ${isUploading ? "scale-100 translate-y-0" : "scale-95 translate-y-5"}
+    `}
+      >
+        <div
+          className="
+    w-full
+    flex
+    justify-between
+    items-center
+    !p-3
+    sm:!p-4
+    border-b
+    border-gray-300
+  "
+        >
+          <h2 className="text-xl font-bold">Add New Item</h2>
+          <p
+            className="text-gray-500 cursor-pointer"
+            onClick={() => setIsUploading(false)}
+          >
+            X
+          </p>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col items-center w-full gap-4 bg-white !p-4 !mt-3 rounded-2xl shadow-lg border-[#C6C6CD] border"
+          className="flex flex-col items-center w-full gap-4 bg-white !p-4 !mt-3 rounded-2xl "
         >
           <span className="flex flex-col justify-start w-full ">
             <label htmlFor="name" className="font-semibold text-[#515F74]">
@@ -305,8 +340,8 @@ const Additem = () => {
                         {item.name}
                       </li>
                     ))
-                  ) : (
-                    <li className="p-2">No Category Available</li>
+                  ) : categoryLoading ? <li className="!p-2">...Loading</li> : (
+                    <li className="!p-2">No Category Available</li>
                   )}
 
                   {hasCategoryMore && (
@@ -340,6 +375,7 @@ const Additem = () => {
             </label>
             <input
               type="text"
+              readOnly
               onFocus={(e) => setBrandDropDownOpen(true)}
               value={brandName}
               name="brand"
@@ -375,7 +411,7 @@ const Additem = () => {
                         {item.name}
                       </li>
                     ))
-                  ) : (
+                  ) : brandLoading ? <li className="!p-2">...Loading</li> : (
                     <li className="p-2">No Brand Available</li>
                   )}
 
@@ -401,6 +437,7 @@ const Additem = () => {
             </label>
             <input
               type="text"
+              readOnly
               onFocus={(e) => {
                 (setModelDropDownOpen(true), setBrandDropDownOpen(false));
               }}
@@ -428,7 +465,7 @@ const Additem = () => {
                         {item.name}
                       </li>
                     ))
-                  ) : (
+                  ) : modelLoading ? <li className="!p-2">...Loading</li> : (
                     <li className="p-2">No Model Available</li>
                   )}
 
@@ -518,7 +555,7 @@ const Additem = () => {
               </svg>
             )}
 
-            {loading ? "Adding..." : "Submit"}
+            {loading ? "Adding..." : "Add Item"}
           </button>
         </form>
       </section>
@@ -526,4 +563,4 @@ const Additem = () => {
   );
 };
 
-export default Additem;
+export default UploadItem;

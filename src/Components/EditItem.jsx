@@ -2,7 +2,7 @@ import React , {useState , useEffect  , useRef} from "react";
 import {toast} from "react-toastify"
 import axios from "axios";
 
-const EditItem = ({ isUpdating, setIsUpdating , id }) => {
+const EditItem = ({ isUpdating, setIsUpdating , id  , fetchData}) => {
 
     const [selectedBrand, setSelectedBrand] = useState(null);
       const [brandPage, setBrandPage] = useState(1);
@@ -226,6 +226,7 @@ const EditItem = ({ isUpdating, setIsUpdating , id }) => {
             );
         }finally{
             setLoading(false)
+            fetchData()
         }
     
     }
