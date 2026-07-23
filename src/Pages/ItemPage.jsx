@@ -26,7 +26,7 @@ const ItemPage = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [searchResponse, setSearchResponse] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [isUploading , setIsUploading]=useState(false)
+  const [isUploading, setIsUploading] = useState(false);
 
   const searchDebounce = useDebounce(search, 500);
   const minPriceDebounce = useDebounce(minPrice, 500);
@@ -143,6 +143,10 @@ const ItemPage = () => {
       return a.price - b.price;
     }
 
+    if(sortType==="byn"){
+      return a.name.localeCompare(b.name)
+    }
+
     return 0;
   });
   useEffect(() => {
@@ -227,7 +231,11 @@ const ItemPage = () => {
         id={selectedItemId}
         fetchData={fetchData}
       />
-      <UploadItem isUploading={isUploading} setIsUploading={setIsUploading} fetchData={fetchData}/>
+      <UploadItem
+        isUploading={isUploading}
+        setIsUploading={setIsUploading}
+        fetchData={fetchData}
+      />
       <div className="itempage-content w-full !p-3 sm:!p-5">
         {/* Sort Section */}
         <div className="w-full flex flex-col gap-2 justify-between items-center !p-1">
@@ -249,18 +257,21 @@ const ItemPage = () => {
 
               {searchType === "name" && (
                 <div className="relative w-full">
-  <input
-    type="text"
-    placeholder="Search Items"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    className="w-full rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7] pr-8"
-  />
+                  <input
+                    type="text"
+                    placeholder="Search Items"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full rounded outline-none !p-2 bg-[#F2F4F6] border border-[#C3C6D7] pr-8"
+                  />
 
-  <p className="absolute right-3 top-1/2 -translate-y-4 text-xl cursor-pointer" onClick={()=>setSearch("")}>
-    x
-  </p>
-</div>
+                  <p
+                    className="absolute right-3 top-1/2 -translate-y-4 text-xl cursor-pointer"
+                    onClick={() => setSearch("")}
+                  >
+                    x
+                  </p>
+                </div>
               )}
 
               {searchType === "price" && (
@@ -334,6 +345,7 @@ const ItemPage = () => {
               onChange={(e) => setSortType(e.target.value)}
             >
               <option value="">Sort By</option>
+              <option value="byn">Sort By Name</option>
               <option value="phtl">Price High to Low</option>
               <option value="plth">Price Low To High</option>
             </select>
@@ -461,7 +473,7 @@ const ItemPage = () => {
                     <p>
                       Showing 1 - {data.length} of {total}
                     </p>{" "}
-                    <div className="">
+                    <div className="gap-2 flex">
                       {Array.from(
                         { length: totalNumberOfPages },
                         (_, index) => (

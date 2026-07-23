@@ -146,6 +146,8 @@ const UploadItem = ({ isUploading, setIsUploading ,fetchData }) => {
     }
   };
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
@@ -501,7 +503,7 @@ const UploadItem = ({ isUploading, setIsUploading ,fetchData }) => {
               name="price"
               id="price"
               value={itemPrice}
-              onChange={(e) => setItemPrice(e.target.value)}
+              onChange={(e) =>{const value = e.target.value.replace(/[^0-9.]/g, ''); setItemPrice(value)}}
             />
           </span>
           <span className="flex flex-col justify-start w-full ">
@@ -515,7 +517,7 @@ const UploadItem = ({ isUploading, setIsUploading ,fetchData }) => {
               name="stock"
               id="stock"
               value={itemStock}
-              onChange={(e) => setItemStock(e.target.value)}
+              onChange={(e) => {const value = e.target.value.replace(/[^0-9.]/g, ''); setItemStock(value)}}
             />
           </span>
           <button
